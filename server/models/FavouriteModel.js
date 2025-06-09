@@ -6,6 +6,16 @@ const { isEmail, isDate } = validator;
 
 const FavouriteSchema = new Schema(
   {
+    contactId: {
+      type: String,
+      unique: true,
+      required: true,
+      default: function () {
+        const timestamp = Date.now();
+        const randomString = Math.random().toString(36).substring(2, 15);
+        return `contact-${timestamp}${randomString}`;
+      },
+    },
     favouriteId: {
       type: String,
       unique: true,
@@ -96,4 +106,4 @@ FavouriteSchema.pre("save", function (next) {
   next();
 });
 
-module.exports = model("Favourite", FavouriteSchema);
+export const Favourite = model("Favourite", FavouriteSchema);

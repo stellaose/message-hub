@@ -1,4 +1,5 @@
 import { Contact } from "../models/ContactModel.js";
+import { Favourite } from "../models/FavouriteModel.js";
 // import dotenv from dotenv
 import validateEmail from "../utils/ValidateEmail.js";
 import ErrorResponse from "../utils/ErrorHandler.js";
@@ -11,7 +12,15 @@ const ContactController = {
           new ErrorResponse("Please enter your a credential to continue.", 400)
         );
       }
-      const { firstName, lastName, phoneNumber, email } = req.body;
+      const {
+        firstName,
+        lastName,
+        phoneNumber,
+        email,
+        profession,
+        companyName,
+        dob,
+      } = req.body;
 
       if (!phoneNumber) {
         return next(
@@ -38,6 +47,9 @@ const ContactController = {
         lastName,
         phoneNumber,
         email,
+        profession,
+        companyName,
+        dob,
       });
 
       res.status(200).json({
@@ -82,8 +94,76 @@ const ContactController = {
       return next(error);
     }
   },
-  
-  updateContact: async () => {},
+
+  updateContact: async (req, res, next) => {
+    try {
+      const {
+        firstName,
+        lastName,
+        phoneNumber,
+        email,
+        profession,
+        companyName,
+        dob,
+      } = req.body;
+      const { contactId } = req.params;
+
+      // ! check if the contact exist
+      const existingContact = await Contact.findOne({ contactId });
+console.log(existingContact, 'exisyting')
+      if (!existingContact) {
+        return next(new ErrorResponse("Contact does not exist", 404));
+        
+      }
+
+      const updatedContactData = {
+        firstName,
+        lastName,
+        phoneNumber,
+        email,
+        profession,
+        companyName,
+        dob,
+      };
+
+      const oneContact = await Contact.findOneAndUpdate(
+        { contactId },
+        updatedContactData,
+        {
+          new: true,
+          runValidators: true,
+        }
+      );
+
+      // # check if it the contact ia also a favourite and update
+      console.log(existingContact.contactId)
+      const favouriteContact = await Favourite.findOne({
+        contactId: existingContact.contactId,
+      });
+      
+      console.log(favouriteContact, 'favourite')
+
+      if (favouriteContact) {
+        await Favourite.findOneAndUpdate(
+          { contactId: existingContact.contactId },
+          updatedContactData,
+          {
+            new: true,
+            runValidators: true,
+          }
+        );
+      }
+
+      res.json({
+        status: 200,
+        success: true,
+        message: "Contact updated successfully",
+        oneContact,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  },
 };
 
 export default ContactController;

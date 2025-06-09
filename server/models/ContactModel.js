@@ -64,7 +64,7 @@ const ContactSchema = new Schema(
       trim: true,
       required: false,
     },
-    importantDate: {
+    dob: {
       type: String,
       trim: true,
       required: false,
