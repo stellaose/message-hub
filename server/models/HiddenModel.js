@@ -6,6 +6,16 @@ const { isEmail, isDate } = validator;
 
 const HiddenSchema = new Schema(
   {
+    contactId: {
+      type: String,
+      unique: true,
+      required: true,
+      default: function () {
+        const timestamp = Date.now();
+        const randomString = Math.random().toString(36).substring(2, 15);
+        return `contact-${timestamp}${randomString}`;
+      },
+    },
     hiddenId: {
       type: String,
       unique: true,
@@ -97,4 +107,4 @@ HiddenSchema.pre("save", function (next) {
   next();
 });
 
-module.exports = model("Hidden", HiddenSchema);
+export const Hidden = model("Hidden", HiddenSchema);

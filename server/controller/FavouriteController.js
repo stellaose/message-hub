@@ -11,16 +11,14 @@ const FavouriteController = {
 
       const findContact = await Contact.findOne({ contactId });
 
-      console.log(findContact.phoneNumber, "find contact");
-
       if (!findContact) {
-        return next(new ErrorResponse("Contact does not exist", 400));
+        return next(new ErrorResponse("Contact does not exist", 404));
       }
 
       // Check if this contact is already a favourite
       const existingFavourite = await Favourite.findOne({ contactId });
       if (existingFavourite) {
-        return next(new ErrorResponse("Contact is already in favourites", 400));
+        return next(new ErrorResponse("Contact is already in favourites", 403));
       }
 
       const {
@@ -45,7 +43,7 @@ const FavouriteController = {
         isFavourite: true,
       });
 
-      res.status(200).json({
+      res.status(201).json({
         success: true,
         favouriteContact,
       });
@@ -53,8 +51,36 @@ const FavouriteController = {
       return next(error);
     }
   },
-  getAllFavourite: async () => {},
-  deleteFavourite: async () => {},
+  getAllFavourite: async (req, res, next) => {
+    try {
+      const allFavourites = await Favourite.find().select(
+        "-createdAt -updatedAt -_id"
+      );
+
+      res.status(200).json({
+        success: true,
+        message: "Favourites gotten successfully",
+        allFavourites,
+      });
+    } catch (error) {
+      return next(error);
+    }
+  },
+  deleteFavourite: async (req, res, next) => {
+    try {
+      const { favouriteId } = req.params;
+
+      const findFavourite = await Favourite.findOneAndDelete({ favouriteId });
+      if (findFavourite) {
+        res.status(200).json({
+          success: true,
+          message: "Favourites deleted successfully",
+        });
+      }
+    } catch (error) {
+      return next(error);
+    }
+  },
 };
 
 export default FavouriteController;

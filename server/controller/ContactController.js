@@ -30,7 +30,7 @@ const ContactController = {
 
       if (email) {
         if (!validateEmail(email)) {
-          return next(new ErrorResponse("Please enter a valid email.", 400));
+          return next(new ErrorResponse("Please enter a valid email.", 403));
         }
       }
 
@@ -38,7 +38,7 @@ const ContactController = {
 
       if (findContact) {
         return next(
-          new ErrorResponse("This number has already been saved.", 400)
+          new ErrorResponse("This number has already been saved.", 403)
         );
       }
 
@@ -52,7 +52,7 @@ const ContactController = {
         dob,
       });
 
-      res.status(200).json({
+      res.status(201).json({
         success: true,
         saveContact,
       });
@@ -110,10 +110,9 @@ const ContactController = {
 
       // ! check if the contact exist
       const existingContact = await Contact.findOne({ contactId });
-console.log(existingContact, 'exisyting')
+
       if (!existingContact) {
         return next(new ErrorResponse("Contact does not exist", 404));
-        
       }
 
       const updatedContactData = {
@@ -136,12 +135,10 @@ console.log(existingContact, 'exisyting')
       );
 
       // # check if it the contact ia also a favourite and update
-      console.log(existingContact.contactId)
       const favouriteContact = await Favourite.findOne({
         contactId: existingContact.contactId,
       });
-      
-      console.log(favouriteContact, 'favourite')
+
 
       if (favouriteContact) {
         await Favourite.findOneAndUpdate(
@@ -154,8 +151,7 @@ console.log(existingContact, 'exisyting')
         );
       }
 
-      res.json({
-        status: 200,
+      res.status(201).json({
         success: true,
         message: "Contact updated successfully",
         oneContact,
