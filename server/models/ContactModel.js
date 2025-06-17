@@ -19,11 +19,13 @@ const ContactSchema = new Schema(
     firstName: {
       type: String,
       trim: true,
+      lowercase:true,
       required: false,
     },
     lastName: {
       type: String,
       trim: true,
+      lowercase:true,
       required: false,
     },
     phoneNumber: {
@@ -51,22 +53,24 @@ const ContactSchema = new Schema(
       trim: true,
       required: false,
       lowercase: true,
-      unique: false,
       validate: [isEmail, "Please enter your email"],
     },
     profession: {
       type: String,
       trim: true,
+      lowercase:true,
       required: false,
     },
     companyName: {
       type: String,
       trim: true,
+      lowercase:true,
       required: false,
     },
     dob: {
       type: String,
       trim: true,
+      lowercase:true,
       required: false,
       validate: [isDate, "Please enter a valid date"],
     },

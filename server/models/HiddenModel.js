@@ -29,11 +29,13 @@ const HiddenSchema = new Schema(
     firstName: {
       type: String,
       trim: true,
+      lowercase:true,
       required: false,
     },
     lastName: {
       type: String,
       trim: true,
+      lowercase:true,
       required: false,
     },
     phoneNumber: {
@@ -72,6 +74,7 @@ const HiddenSchema = new Schema(
     companyName: {
       type: String,
       trim: true,
+      lowercase:true,
       required: false,
     },
     importantDate: {

@@ -29,11 +29,13 @@ const FavouriteSchema = new Schema(
     firstName: {
       type: String,
       trim: true,
+      lowercase:true,
       required: false,
     },
     lastName: {
       type: String,
       trim: true,
+      lowercase:true,
       required: false,
     },
     phoneNumber: {
@@ -67,11 +69,13 @@ const FavouriteSchema = new Schema(
     profession: {
       type: String,
       trim: true,
+      lowercase:true,
       required: false,
     },
     companyName: {
       type: String,
       trim: true,
+      lowercase:true,
       required: false,
     },
     importantDate: {

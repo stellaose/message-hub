@@ -1,55 +1,85 @@
 class ApiFeatures {
-    constructor(query, queryStr){
-        this.query = query;
-        this.queryStr = queryStr;
-    }
+  constructor(query, queryStr) {
+    this.query = query;
+    this.queryStr = queryStr;
+  }
 
-    search(){
-        const keyword = this.queryStr.keyword ? {
-            name: {
+  search() {
+    const keyword = this.queryStr.keyword
+      ? {
+          $or: [
+            {
+              firstName: {
                 $regex: this.queryStr.keyword,
                 $options: "i",
+              },
             },
-        } : {}
+            {
+              lastName: {
+                $regex: this.queryStr.keyword,
+                $options: "i",
+              },
+            },
+            {
+              phoneNumber: {
+                $regex: this.queryStr.keyword,
+                $options: "i",
+              },
+            },
+            {
+              companyName: {
+                $regex: this.queryStr.keyword,
+                $options: "i",
+              },
+            },
+            {
+              profession: {
+                $regex: this.queryStr.keyword,
+                $options: "i",
+              },
+            },
+            {
+              email: {
+                $regex: this.queryStr.keyword,
+                $options: "i",
+              },
+            },
+          ],
+        }
+      : {};
 
-        console.log(keyword)
+    this.query = this.query.find({ ...keyword });
+    return this;
+  }
 
-        this.query = this.query.find({...keyword});
-        return this;
-    }
+  filter() {
+    const queryCopy = { ...this.queryStr };
 
-    filter(){
-        const queryCopy = {...this.queryStr};
 
-        console.log(queryCopy);
+    // ! remove fields for category
+    const removeFields = ["keyword", "page", "limit"];
 
-        // ! remove fields for category
-        const removeFields = ["keyword", "page", "limit"];
+    removeFields.forEach(key => delete queryCopy[key]);
 
-        removeFields.forEach(key => delete queryCopy[key]);
+    // + filter category for price and rating
+    let queryStr = JSON.stringify(queryCopy);
 
-        // + filter category for price and rating
-        let queryStr = JSON.stringify(queryCopy);
+    queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, key => `$${key}`);
 
-        queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, (key) => `$${key}`)
+    this.query = this.query.find(JSON.parse(queryStr));
 
-        this.query = this.query.find(JSON.parse(queryStr));
+    return this;
+  }
 
-        console.log(queryStr)
+  pagination(resultPerPage) {
+    const currentPage = Number(this.queryStr.page) || 1;
 
-        return this;
+    const skip = resultPerPage * (currentPage - 1);
 
-    }
+    this.query = this.query.limit(resultPerPage).skip(skip);
 
-    pagination(resultPerPage){
-        const currentPage = Number(this.queryStr.page) || 1;
-
-        const skip = resultPerPage * (currentPage - 1);
-
-        this.query = this.query.limit(resultPerPage).skip(skip);
-
-        return this;
-    }
+    return this;
+  }
 }
 
 export default ApiFeatures;

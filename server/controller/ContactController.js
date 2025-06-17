@@ -3,6 +3,7 @@ import { Favourite } from "../models/FavouriteModel.js";
 // import dotenv from dotenv
 import validateEmail from "../utils/ValidateEmail.js";
 import ErrorResponse from "../utils/ErrorHandler.js";
+import ApiFeatures from "../utils/ApiFeatures.js";
 
 const ContactController = {
   createContact: async (req, res, next) => {
@@ -54,6 +55,7 @@ const ContactController = {
 
       res.status(201).json({
         success: true,
+        message:"Contact created successfully",
         saveContact,
       });
     } catch (error) {
@@ -61,16 +63,57 @@ const ContactController = {
     }
   },
 
+  // getAllProducts: async (req, res, next) => {
+  //   try{
+  //     const resultPerPage = 12;
+  //     const countProduct = await Product.countDocuments();
+
+  //     const apiFeature = new ApiFeatures(Product.find(), req.query)
+  //     .search()
+  //     .filter()
+
+  //     apiFeature.pagination(resultPerPage)
+
+  //     let findProduct = await apiFeature.query
+
+  //     let filteredProductCount = findProduct.length;
+
+  //     findProduct = await apiFeature.query.clone()
+
+  //     if(findProduct){
+  //       return res.json({
+  //         status: 200,
+  //         success: true,
+  //         findProduct,
+  //         countProduct,
+  //         resultPerPage,
+  //         filteredProductCount
+  //       })
+  //     }
+  //   } catch(err){
+  //     console.log(err);
+  //       return next
+  //         (new ErrorResponse('Server error', 500))
+  //   }
+  // },
+
   getAllContacts: async (req, res, next) => {
     try {
-      const allContacts = await Contact.find().select(
-        "-createdAt -updatedAt -_id"
-      );
+      const apiFeature = new ApiFeatures(
+        Contact.find().select("-createdAt -updatedAt -_id"),
+        req.query
+      )
+        .search()
+        .filter();
 
-      res.status(200).json({
-        success: true,
-        allContacts,
-      });
+      let allContacts = await apiFeature.query;
+
+      if (allContacts) {
+        res.status(200).json({
+          success: true,
+          allContacts,
+        });
+      }
     } catch (error) {
       return next(error);
     }
@@ -138,7 +181,6 @@ const ContactController = {
       const favouriteContact = await Favourite.findOne({
         contactId: existingContact.contactId,
       });
-
 
       if (favouriteContact) {
         await Favourite.findOneAndUpdate(
