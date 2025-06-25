@@ -1,11 +1,8 @@
 import request from "supertest";
 import app from "../app.js";
-import dotenv from "dotenv";
-import mongoose from "mongoose";
-// import jest from "jest";
 import { Contact } from "../models/ContactModel.js";
+import { Favourite } from "../models/FavouriteModel.js";
 
-dotenv.config();
 
 // Mock the Contact model
 jest.mock("../models/ContactModel.js", () => ({
@@ -16,12 +13,16 @@ jest.mock("../models/ContactModel.js", () => ({
     findOneAndUpdate: jest.fn(),
   },
 }));
+jest.mock("../models/FavouriteModel.js", () => ({
+  Favourite: {
+    findOne: jest.fn(),
+    findOneAndUpdate: jest.fn(),
+  },
+}));
 
-const db = `mongodb+srv://${process.env.DATABASE_NAME}:${process.env.DATABASE_PASSWORD}@${process.env.DATABASE_USER}.iatogay.mongodb.net/?retryWrites=true&w=majority&appName=${process.env.CLUSTER_NAME}`;
 
 // # open database before each connection and clear mock before each test
 beforeEach(async () => {
-  await mongoose.connect(db);
   jest.clearAllMocks();
 });
 
@@ -128,11 +129,11 @@ describe("PUT /api/contact/one/:contactId", () => {
       email: "john@example.com",
       profession: "developer",
     };
-    
+
     // Mock Contact.findOne() to return an object
     Contact.findOne.mockReturnValue(mockContact);
-    
-     const updatedMockContact = {
+
+    const updatedMockContact = {
       contactId: "contact-123",
       firstName: "john",
       lastName: "doe",
@@ -140,10 +141,16 @@ describe("PUT /api/contact/one/:contactId", () => {
       email: "john@example.com",
       profession: "developer",
     };
-    
+
     Contact.findOneAndUpdate.mockReturnValue(updatedMockContact);
+
+    // $ find one in the favourite model
+    Favourite.findOne.mockReturnValue(mockContact);
     
-     const res = await request(app)
+    // ! Update the favourite model
+    Favourite.findOneAndUpdate.mockReturnValue(updatedMockContact);
+    
+    const res = await request(app)
       .put(`/api/contact/one/${contactId}`)
       .send({
         phoneNumber: "07012288738",
@@ -153,11 +160,6 @@ describe("PUT /api/contact/one/:contactId", () => {
     expect(res.status).toBe(201);
     expect(res.body.success).toBe(true);
     expect(res.body.message).toBe("Contact updated successfully");
-  
   });
 });
 
-// * Closing database connection after each test.
-afterEach(async () => {
-  await mongoose.connection.close();
-});

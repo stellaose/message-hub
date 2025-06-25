@@ -182,7 +182,7 @@ const ContactController = {
         contactId: existingContact.contactId,
       });
 
-      if (favouriteContact) {
+      if (favouriteContact  && oneContact) {
         await Favourite.findOneAndUpdate(
           { contactId: existingContact.contactId },
           updatedContactData,

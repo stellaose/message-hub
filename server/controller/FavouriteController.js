@@ -45,11 +45,12 @@ const FavouriteController = {
 
       res.status(201).json({
         success: true,
+        message:'Favourite created successfully',
         favouriteContact,
       });
     } catch (error) {
       return next(error);
-    }
+    }n
   },
   getAllFavourite: async (req, res, next) => {
     try {
@@ -74,7 +75,7 @@ const FavouriteController = {
       if (findFavourite) {
         res.status(200).json({
           success: true,
-          message: "Favourites deleted successfully",
+          message: "Favourite deleted successfully",
         });
       }
     } catch (error) {

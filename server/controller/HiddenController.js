@@ -1,7 +1,7 @@
 import { Hidden } from "../models/HiddenModel.js";
 import { Contact } from "../models/ContactModel.js";
+import { Favourite } from "../models/FavouriteModel.js";
 // import dotenv from dotenv
-import validateEmail from "../utils/ValidateEmail.js";
 import ErrorResponse from "../utils/ErrorHandler.js";
 
 const HiddenController = {
@@ -49,6 +49,7 @@ const HiddenController = {
 
       if (hideContact) {
         await Contact.findOneAndDelete({ contactId });
+        await Favourite.findOneAndDelete({ contactId });
 
         res.status(201).json({
           success: true,
@@ -80,8 +81,6 @@ const HiddenController = {
   restoreHidden: async (req, res, next) => {
     try {
       const { contactId } = req.params;
-      
-      
 
       const checkIfHidden = await Hidden.findOne({ contactId });
 
@@ -126,14 +125,14 @@ const HiddenController = {
   deleteHidden: async (req, res, next) => {
     try {
       const { contactId } = req.params;
-      
-      const deleteHidden = await Hidden.findOneAndDelete({ contactId })
-      
+
+      const deleteHidden = await Hidden.findOneAndDelete({ contactId });
+
       if (deleteHidden) {
         res.status(200).json({
           status: true,
-          message: 'Contact deleted successfully'
-        })
+          message: "Contact deleted successfully",
+        });
       }
     } catch (error) {
       return next(error);
