@@ -53,7 +53,7 @@ describe("POST api/hidden/new/:contactId", () => {
     Hidden.findOne.mockResolvedValue(null);
 
     Hidden.create.mockResolvedValue(mockContact);
-    
+
     // ~ delete from contact and favourite database when contact has been deleted temporarily
     Contact.findOneAndDelete.mockResolvedValue(mockContact);
     Favourite.findOneAndDelete.mockResolvedValue(mockContact);
@@ -105,5 +105,57 @@ describe("GET api/hidden/all", () => {
       .get("/api/hidden/all")
       .set("Accept", "application/json");
     expect(res.status).toBe(200);
+  });
+});
+
+// ' restoreHidden  test
+describe("PUT api/hidden/restore/:contactId", () => {
+  it("responds with a json", async () => {
+    const contactId = "contact-17500829869317dws115m56x";
+
+    const mockContact = {
+      contactId: "contact-123",
+      firstName: "john",
+      lastName: "doe",
+      phoneNumber: "07012284438",
+      email: "john@example.com",
+      profession: "developer",
+    };
+
+    Hidden.findOne.mockResolvedValue(mockContact);
+    Hidden.findOneAndDelete.mockResolvedValue(mockContact);
+    Contact.create.mockResolvedValue(mockContact);
+
+    const res = await request(app)
+      .put(`/api/hidden/restore/${contactId}`)
+      .set("Accept", "application/json");
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.message).toBe("Contact restored successfully");
+  });
+});
+
+// - deleteHidden test
+describe("DELETE api/hidden/delete/:contactId", () => {
+  it("responds with a json", async () => {
+    const contactId = "contact-17500829869317dws115m56x";
+
+    const mockContact = {
+      contactId: "contact-123",
+      firstName: "john",
+      lastName: "doe",
+      phoneNumber: "07012284438",
+      email: "john@example.com",
+      profession: "developer",
+    };
+
+    Hidden.findOneAndDelete.mockResolvedValue(mockContact);
+
+    const res = await request(app)
+      .delete(`/api/hidden/delete/${contactId}`)
+      .set("Accept", "application/json");
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+    expect(res.body.message).toBe("Contact deleted successfully");
   });
 });

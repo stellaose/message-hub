@@ -130,7 +130,7 @@ const HiddenController = {
 
       if (deleteHidden) {
         res.status(200).json({
-          status: true,
+          success: true,
           message: "Contact deleted successfully",
         });
       }
